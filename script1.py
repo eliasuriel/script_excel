@@ -7,8 +7,6 @@ import csv
 import tkinter as tk
 from tkinter import filedialog
 
-
-
 #print("Asking for input file")
 #root = tk.Tk()
 #root.withdraw()
@@ -35,31 +33,39 @@ df['Sep'] = df['Sep'].fillna(0)
 columna2 = df['Sep']
 columna1 = df['ResourceName']
 
-cont = 0
+df = df[df['Sep'] != 0]
+
+cont_product = 0
+cont_horas = 0
 employees = []
-tasks = []
 horas = []
 i = 2
+
+WORK_DAYS = int(input("How many work days are in this report?: ") )
+
 for index, row in df.iterrows():
     columna_tareas = row['ResourceName']
     columna_horas = row['Sep']
     print(columna_tareas)
-
+    print(columna_horas)
+    if columna_horas == 0:
+        print()
     if columna_tareas.startswith("   P_"):
-        print("entre")
-        cont = cont + columna_horas
+        #print("entre")
+        cont_product = cont_product + columna_horas
     elif columna_tareas.endswith('-MS)') or columna_tareas.endswith('-MX)') or columna_tareas.endswith('-SX)'):
-        if cont!=0:
-            cont = cont/148
-            horas.append(cont)
-            cont = 0
+        if cont_product!=0:
+            cont_product = cont_product/148
+            horas.append(cont_product)
+            cont_product = 0
     
 
     
 
 
 
-print(cont)
+#print(cont)
+
 print(horas)
  
 #print(df)
