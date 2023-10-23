@@ -33,39 +33,48 @@ df['Sep'] = df['Sep'].fillna(0)
 columna2 = df['Sep']
 columna1 = df['ResourceName']
 
-df = df[df['Sep'] != 0]
-
-cont_product = 0
-cont_horas = 0
-employees = []
+Productivity1 = 0
+Productivity2 = 0
 horas = []
-i = 2
+horas2 = []
+cont = 0
 
 WORK_DAYS = int(input("How many work days are in this report?: ") )
 
 for index, row in df.iterrows():
     columna_tareas = row['ResourceName']
     columna_horas = row['Sep']
-    print(columna_tareas)
-    print(columna_horas)
-    if columna_horas == 0:
-        print()
+    #print(columna_tareas)
+    #print(columna_horas)
     if columna_tareas.startswith("   P_"):
         #print("entre")
-        cont_product = cont_product + columna_horas
+        Productivity1 = Productivity1 + columna_horas
+        Productivity2 = Productivity2 + columna_horas
     elif columna_tareas.endswith('-MS)') or columna_tareas.endswith('-MX)') or columna_tareas.endswith('-SX)'):
-        if cont_product!=0:
-            cont_product = cont_product/148
-            horas.append(cont_product)
-            cont_product = 0
+        cont = cont + 1
+        if Productivity1 !=0:
+            Productivity1 = Productivity1/148
+            horas.append(Productivity1)
+            Productivity1 = 0
+        else:
+            if(cont >= 2):
+                horas.append(Productivity1)
+        if  Productivity2 !=0:
+            Productivity2 = Productivity2/148
+            horas2.append(Productivity2)
+            Productivity2= 0
     
+#df = df[df['Sep'] != 0]
 
-    
 
-
+        
 
 #print(cont)
 
 print(horas)
+
+
+print("OTRA")
  
+print(horas2)
 #print(df)
