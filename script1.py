@@ -34,6 +34,7 @@ horas = []
 horas2 = []
 EGB_Group = []
 cont = 0
+cont_empleados = 0
 
 WORK_DAYS = int(input("How many work days are in this report?: ") )
 
@@ -48,6 +49,7 @@ for index, row in df.iterrows():
         Productivity2 = Productivity2 + columna_horas
     elif columna_tareas.endswith('-MS)') or columna_tareas.endswith('-MX)') or columna_tareas.endswith('-SX)'):
         cont = cont + 1
+        cont_empleados = cont_empleados + 1
         if Productivity1 !=0:
             Productivity1 = Productivity1/148
             horas.append(Productivity1)
@@ -82,13 +84,14 @@ for index, row in df.iterrows():
         EGB_Group.append('EBM8')
     elif 'EBS6' in columna_tareas:
         EGB_Group.append('EBS6')
+    elif 'EGB' in columna_tareas:
+        EGB_Group.append('EGB')
     #else:
      #   EGB_Group.append(' ')
 
-  
 print(EGB_Group)  
-#print(cont)
-print("Horas: \n")
-print(horas)
-print("OTRA \n" )
-print(horas2)
+print(cont_empleados)
+#print("Horas: \n")
+#print(horas)
+#print("OTRA \n" )
+#print(horas2)
