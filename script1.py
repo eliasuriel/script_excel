@@ -26,7 +26,7 @@ df = excel_file.parse('Sheet1')
 df['Sep'] = df['Sep'].fillna(0)
 columna2 = df['Sep']
 columna1 = df['ResourceName']
-df['EGB_Group'] = '' 
+
 
 Productivity1 = 0
 Productivity2 = 0
@@ -86,18 +86,9 @@ for index, row in df.iterrows():
      #   EGB_Group.append(' ')
 
   
-    
-
-
-
 print(EGB_Group)  
-#df = df[df['Sep'] != 0]
-
-
-        
-
 #print(cont)
-#print(horas)
-#print("OTRA \n" )
-#print(horas2)
-#print(df)
+print("Horas: \n")
+print(horas)
+print("OTRA \n" )
+print(horas2)
