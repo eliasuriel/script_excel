@@ -47,7 +47,7 @@ for index, row in df.iterrows():
         #print("entre")
         Productivity1 = Productivity1 + columna_horas
         Productivity2 = Productivity2 + columna_horas
-    elif columna_tareas.endswith('-MS)') or columna_tareas.endswith('-MX)') or columna_tareas.endswith('-SX)'):
+    elif 'EGB3' in columna_tareas or 'EGB8' in columna_tareas or 'EGB9' in columna_tareas or 'EGB10' in columna_tareas or 'EGB11' in columna_tareas or 'EGB12' in columna_tareas:
         cont = cont + 1
         cont_empleados = cont_empleados + 1
         if Productivity1 !=0:
@@ -74,24 +74,15 @@ for index, row in df.iterrows():
         EGB_Group.append('EGB11')
     elif 'EGB12' in columna_tareas:
         EGB_Group.append('EGB12')
-    elif 'ECC1.3' in columna_tareas:
-        EGB_Group.append('ECC1.3')
-    elif 'EBS2.1.9' in columna_tareas:
-        EGB_Group.append('EBS2.1.9')
-    elif 'EMM2.2.2' in columna_tareas:
-        EGB_Group.append('EMM2.2.2')
-    elif 'EBM8' in columna_tareas:
-        EGB_Group.append('EBM8')
-    elif 'EBS6' in columna_tareas:
-        EGB_Group.append('EBS6')
     elif 'EGB' in columna_tareas:
         EGB_Group.append('EGB')
     #else:
      #   EGB_Group.append(' ')
 
-print(EGB_Group)  
+#print(EGB_Group)  
 print(cont_empleados)
 #print("Horas: \n")
-#print(horas)
+print(len(horas))
+print(horas)
 #print("OTRA \n" )
 #print(horas2)
