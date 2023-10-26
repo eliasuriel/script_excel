@@ -5,6 +5,7 @@ import os
 import csv
 import openpyxl
 from openpyxl.styles import PatternFill
+from openpyxl.styles import NamedStyle
 
 import tkinter as tk
 from tkinter import filedialog
@@ -31,15 +32,19 @@ columna2 = df['Sep']
 columna1 = df['ResourceName']
 df['EGB_Group'] = '' 
 
-Productivity1 = 0
-Productivity2 = 0
-horas = []
-horas2 = []
-EGB_Group = []
+
 Nombres_Tareas = []
+hours = []
+Productivity = []
+EGB_Group = []
+
 cont = 0
 conditional = 0
-
+Productivity_abs = 0
+Productivity_rel = 0
+Productivity_sum = 0
+Var_productivity = 0
+cont_rel = 0
 
 WORK_DAYS = int(input("How many work days are in this report?: ") )
 print(WORK_DAYS)
@@ -47,26 +52,23 @@ print(WORK_DAYS)
 for index, row in df.iterrows():
     columna_tareas = row['ResourceName']
     columna_horas = row['Sep']
-    #print(columna_tareas)
-    #print(columna_horas)
+    
 
     if 'EGB' in columna_tareas:
         cont = cont + 1
         Nombres_Tareas.append(columna_tareas)
+        hours.append(columna_horas)
         conditional = 1
 
-        if Productivity1 !=0:
-            Productivity1 = Productivity1/148
-            horas.append(Productivity1)
-            Productivity1 = 0
-        else:
-            if(cont >= 2):
-                horas.append(Productivity1)
-        if  Productivity2 !=0:
-            Productivity2 = Productivity2/148
-            horas2.append(Productivity2)
-            Productivity2= 0
+        if cont > 1:
+            Productivity.append(Var_productivity/148)
 
+            if Var_productivity != 0:
+                cont_rel = cont_rel + 1
+
+            Var_productivity = 0
+
+            
         if 'EGB3' in columna_tareas:
             EGB_Group.append('EGB3')
         elif 'EGB8' in columna_tareas:
@@ -84,17 +86,22 @@ for index, row in df.iterrows():
 
     elif columna_tareas.startswith("   P_") and conditional == 1 and columna_horas != 0:
         Nombres_Tareas.append(columna_tareas)
+        hours.append(columna_horas)
         EGB_Group.append(' ')
-        Productivity1 = Productivity1 + columna_horas
-        Productivity2 = Productivity2 + columna_horas
+        Productivity_sum = Productivity_sum + columna_horas
+        Var_productivity = Var_productivity + columna_horas
+
     
     elif conditional == 1  and columna_horas != 0:
         Nombres_Tareas.append(columna_tareas)
+        hours.append(columna_horas)
         EGB_Group.append(' ')
+
     
     elif not 'EGB' in columna_tareas and (columna_tareas.endswith('-MS)') or columna_tareas.endswith('-MX)') or columna_tareas.endswith('-SX)')):
         conditional = 0
     
+Productivity.append(Var_productivity/148)
 
 
 
@@ -143,29 +150,41 @@ hoja['H2'] = HOURS_PER_DAY
 hoja['I1'] = 'Total hrs'
 hoja['I2'] = HOURS_PER_DAY*WORK_DAYS
 
+Productivity_abs = (Productivity_sum/148) / cont
+Productivity_rel = (Productivity_sum/148) / cont_rel
 
 
 #Resultados
-hoja['G5'] = 'Productivity Sum(%)'
-hoja['G6'] = '=SUMA(C:C)'
+hoja['G5'] = 'Abs. Productivity Sum(%)'
+hoja['G6'] = Productivity_sum/148
 hoja['H5'] = 'Qty People'
-hoja['H6'] = '=CONTAR(C:C)'
-hoja['I5'] = '% total'
-hoja['I6'] = '=G6/H6'
+hoja['H6'] = cont
+hoja['I5'] = 'Average Abs. Productivity'
+hoja['I6'] = Productivity_abs
+hoja['J5'] = 'Average Rel. Productivity'
+hoja['J6'] = Productivity_rel
 
 
 #Imprimir nombres y tareas
 for filas, contenido in enumerate(Nombres_Tareas, start=1):
     hoja.cell(row=filas+1, column=1, value=contenido)
 
+#Imprimir nombres y tareas
+for filas, contenido in enumerate(hours, start=1):
+    hoja.cell(row=filas+1, column=2, value=contenido)
+
 #Imprimir EGB group
 for filas, contenido in enumerate(EGB_Group, start=1):
     hoja.cell(row=filas+1, column=5, value=contenido)
 
 
-
-
-
+#Imprimir Productividad
+counter = 0
+for filas, contenido in enumerate(Nombres_Tareas, start=1):
+    if 'EGB' in contenido:
+       hoja.cell(row=filas+1, column=3, value=Productivity[counter])
+       counter +=1  
+    
 
 # Itera a través de todas las columnas en la hoja para ajustar su ancho
 for columna in hoja.columns:
@@ -179,7 +198,40 @@ for columna in hoja.columns:
                 longitud_maxima = longitud_celda
 
     # Establece el ancho de la columna para ajustarlo al contenido más largo
-    hoja.column_dimensions[columna_letra].width = longitud_maxima + 5
+    hoja.column_dimensions[columna_letra].width = longitud_maxima + 2
+
+
+
+
+# Verificar si el estilo de porcentaje ya existe
+porcentaje_style = None
+for style in workbook.style_names:
+    if style == 'porcentaje_style':
+        porcentaje_style = style
+        break
+
+# Si el estilo no existe, se crea
+if porcentaje_style is None:
+    porcentaje_style = openpyxl.styles.NamedStyle(name='porcentaje_style')
+    porcentaje_style.number_format = '0.00%'
+
+columna = 3
+filas_1 = 2
+
+# Aplicar el estilo a la columna de productividad
+for fila in hoja.iter_rows(min_row=2, min_col=columna, max_col=columna, values_only=True):
+    celda = hoja.cell(row=filas_1, column=columna)
+    celda.style = porcentaje_style
+    filas_1 += 1
+
+celda = hoja['G6'] 
+celda.style = porcentaje_style
+
+celda = hoja['I6'] 
+celda.style = porcentaje_style
+
+celda = hoja ['J6']
+celda.style = porcentaje_style
 
 workbook.save(ruta_completa)
 
