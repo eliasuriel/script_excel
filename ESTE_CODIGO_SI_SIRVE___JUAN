@@ -256,10 +256,10 @@ Productivity_rel_array.append(Productivity_rel_EGB11)
 Productivity_rel_array.append(Productivity_rel_EGB12)
  
 #Resultados
-hoja['H5'] = 'High Hours Value (+10%)'
+hoja['H5'] = 'High Value (+10%)'
 HIGH_VALUE = TOTAL_HOURS*1.1
 hoja['H6'] = HIGH_VALUE
-hoja['I5'] = 'Low Hours Value (-5%)'
+hoja['I5'] = 'Low Value (-5%)'
 LOW_VALUE = TOTAL_HOURS*0.95
 hoja['I6'] = LOW_VALUE
 
@@ -373,9 +373,10 @@ letras_rojas = Font(color="FF0000")
 #### Aplicar los estilos a los Títulos ########
 #Encabezados
 for i in range (9):
-    celda = hoja.cell(row = 1, column = i+1)
-    celda.fill = relleno_verde__titulos
-    celda.font = negritas
+    if i != 5:
+        celda = hoja.cell(row = 1, column = i+1)
+        celda.fill = relleno_verde__titulos
+        celda.font = negritas
 
 #Days, hours per days, total hrs
 for i in range (3):
@@ -535,7 +536,7 @@ if table_name in existing_tables:
  
  
 #Crea una nueva tabla
-table = Table(displayName=table_name, ref="A:E")  
+table = Table(displayName=table_name, ref=("A1:E")+str(len(Nombres_Tareas)+1))
 style = TableStyleInfo(
     name="TableStyleMedium9", showFirstColumn=False,
     showLastColumn=False, showRowStripes=False, showColumnStripes=False)
@@ -544,8 +545,8 @@ hoja.add_table(table)
  
  
  
-# Ajustar el ancho de las columnas de la hoja de excel
-for columna in hoja.columns:
+# Ajustar el ancho de las columnas de la tabla
+for columna in hoja.iter_cols(min_col=1, max_col=5):
     longitud_maxima = 0
     columna_letra = columna[0].column_letter  # Obtiene la letra de la columna
     for celda in columna:
@@ -557,6 +558,21 @@ for columna in hoja.columns:
  
     # Establece el ancho de la columna para ajustarlo al contenido más largo
     hoja.column_dimensions[columna_letra].width = longitud_maxima + 4
+
+# Ajustar el ancho de las columnas de los resultados
+for columna in hoja.iter_cols(min_col=7, max_col=9):
+    longitud_maxima = 0
+    columna_letra = columna[0].column_letter  # Obtiene la letra de la columna
+    for celda in columna:
+        if celda.value:
+            # Calcula la longitud máxima del contenido en la columna
+            longitud_celda = len(str(celda.value))
+            if longitud_celda > longitud_maxima:
+                longitud_maxima = longitud_celda
+ 
+    # Establece el ancho de la columna para ajustarlo al contenido más largo
+    hoja.column_dimensions[columna_letra].width = longitud_maxima -2
+
  
 workbook.save(ruta_completa)
  
