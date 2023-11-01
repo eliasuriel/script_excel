@@ -78,6 +78,13 @@ cont_relEGB10 = 0
 cont_relEGB11 = 0
 cont_relEGB12 = 0
 
+cont_grupo =0
+
+cont_grupo_EGB8 =0
+cont_grupo_EGB9 =0
+cont_grupo_EGB10 =0
+cont_grupo_EGB11 =0
+cont_grupo_EGB12 =0
 
 
 WORK_DAYS = int(easygui.enterbox(msg="How many work days are in this report?: "))
@@ -89,11 +96,15 @@ for index, row in df.iterrows():
    
  
     if 'EGB' in columna_tareas and 'EGB3' not in columna_tareas:
+        
         cont = cont + 1
         Nombres_Tareas.append(columna_tareas)
         hours.append(columna_horas)
         conditional = 1
-        
+        if columna_horas == 0:
+            cont_grupo = cont_grupo + 1
+       
+    
         if cont > 1:
             Productivity.append(Var_productivity/148)
             
@@ -114,28 +125,38 @@ for index, row in df.iterrows():
 
  
             Var_productivity = 0
- 
+
            
         if 'EGB8' in columna_tareas:
             EGB_Group.append('EGB8')
             last_group = 'EGB8'
             cont_EGB8 = cont_EGB8 + 1
+            if columna_horas == 0:
+                cont_grupo_EGB8 = cont_grupo_EGB8+ 1
         elif 'EGB9' in columna_tareas:
             EGB_Group.append('EGB9')
             last_group = 'EGB9'
             cont_EGB9 = cont_EGB9 + 1
+            if columna_horas == 0:
+                cont_grupo_EGB9 = cont_grupo_EGB9+ 1
         elif 'EGB10' in columna_tareas:
             EGB_Group.append('EGB10')
             last_group = 'EGB10'
             cont_EGB10 = cont_EGB10 + 1
+            if columna_horas == 0:
+                cont_grupo_EGB10 = cont_grupo_EGB10 + 1
         elif 'EGB11' in columna_tareas:
             EGB_Group.append('EGB11')
             last_group = 'EGB11'
             cont_EGB11 = cont_EGB11 + 1
+            if columna_horas == 0:
+                cont_grupo_EGB11 = cont_grupo_EGB11 + 1
         elif 'EGB12' in columna_tareas:
             EGB_Group.append('EGB12')
             last_group = 'EGB12'
             cont_EGB12 = cont_EGB12 + 1
+            if columna_horas == 0:
+                cont_grupo_EGB12 = cont_grupo_EGB12 + 1
         else:
             EGB_Group.append(' ')
  
@@ -145,7 +166,6 @@ for index, row in df.iterrows():
         EGB_Group.append(' ')
         Productivity_sum = Productivity_sum + columna_horas
         Var_productivity = Var_productivity + columna_horas
-
         if last_group == 'EGB8':
             Productivity_abs_EGB8 = Productivity_abs_EGB8 + columna_horas
         elif last_group == 'EGB9':
@@ -170,11 +190,11 @@ for index, row in df.iterrows():
    
 Productivity.append(Var_productivity/148)
  
-People_per_group.append(cont_EGB8)
-People_per_group.append(cont_EGB9)
-People_per_group.append(cont_EGB10)
-People_per_group.append(cont_EGB11)
-People_per_group.append(cont_EGB12)
+People_per_group.append(cont_EGB8-cont_grupo_EGB8)
+People_per_group.append(cont_EGB9-cont_grupo_EGB9)
+People_per_group.append(cont_EGB10-cont_grupo_EGB10)
+People_per_group.append(cont_EGB11-cont_grupo_EGB11)
+People_per_group.append(cont_EGB12-cont_grupo_EGB12)
 
  
 ###########################################################
@@ -228,7 +248,7 @@ hoja['I1'] = 'Total hrs'
 TOTAL_HOURS = HOURS_PER_DAY*WORK_DAYS
 hoja['I2'] = TOTAL_HOURS
  
-Productivity_abs = (Productivity_sum/148) / cont
+Productivity_abs = (Productivity_sum/148) / (cont-cont_grupo)
 Productivity_rel = (Productivity_sum/148) / cont_rel
  
 Productivity_rel_EGB8 = (Productivity_abs_EGB8/148) / cont_relEGB8
@@ -237,11 +257,11 @@ Productivity_rel_EGB10 = (Productivity_abs_EGB10/148) / cont_relEGB10
 Productivity_rel_EGB11 = (Productivity_abs_EGB11/148) / cont_relEGB11
 Productivity_rel_EGB12 = (Productivity_abs_EGB12/148) / cont_relEGB12
 
-Productivity_abs_EGB8 = (Productivity_abs_EGB8/148) / cont_EGB8
-Productivity_abs_EGB9 = (Productivity_abs_EGB9/148) / cont_EGB9
-Productivity_abs_EGB10 = (Productivity_abs_EGB10/148) / cont_EGB10
-Productivity_abs_EGB11 = (Productivity_abs_EGB11/148) / cont_EGB11
-Productivity_abs_EGB12 = (Productivity_abs_EGB12/148) / cont_EGB12
+Productivity_abs_EGB8 = (Productivity_abs_EGB8/148) / (cont_EGB8-cont_grupo_EGB8)
+Productivity_abs_EGB9 = (Productivity_abs_EGB9/148) / (cont_EGB9-cont_grupo_EGB9)
+Productivity_abs_EGB10 = (Productivity_abs_EGB10/148) / (cont_EGB10-cont_grupo_EGB10)
+Productivity_abs_EGB11 = (Productivity_abs_EGB11/148) / (cont_EGB11-cont_grupo_EGB11)
+Productivity_abs_EGB12 = (Productivity_abs_EGB12/148) / (cont_EGB12-cont_grupo_EGB12)
 
 Productivity_abs_array = []
 Productivity_abs_array.append(Productivity_abs_EGB8)
@@ -273,7 +293,7 @@ hoja['I9'] = 'Low Productivity'
 hoja['I10'] = '< 75%'
 
 hoja['G13'] = 'Qty People'
-hoja['G14'] = cont
+hoja['G14'] = (cont - cont_grupo)
 hoja['H13'] = 'Average Abs. Productivity'
 hoja['H14'] = Productivity_abs
 hoja['I13'] = 'Average Rel. Productivity'
