@@ -72,6 +72,7 @@ cont_EGB9 = 0
 cont_EGB10 = 0
 cont_EGB11 = 0
 cont_EGB12 = 0
+
 cont_relEGB8 = 0
 cont_relEGB9 = 0
 cont_relEGB10 = 0
@@ -85,6 +86,12 @@ cont_grupo_EGB9 =0
 cont_grupo_EGB10 =0
 cont_grupo_EGB11 =0
 cont_grupo_EGB12 =0
+
+Var_productivity_EGB8 = 0
+Var_productivity_EGB9 = 0
+Var_productivity_EGB10 = 0
+Var_productivity_EGB11 = 0
+Var_productivity_EGB12 = 0
 
 
 WORK_DAYS = int(easygui.enterbox(msg="How many work days are in this report?: "))
@@ -112,19 +119,24 @@ for index, row in df.iterrows():
             if Var_productivity != 0:
                 cont_rel = cont_rel + 1
 
-                if last_group == 'EGB8':
-                    cont_relEGB8 = cont_relEGB8 + 1
-                elif last_group == 'EGB9':
-                    cont_relEGB9 = cont_relEGB9 + 1
-                elif last_group == 'EGB10':
-                    cont_relEGB10 = cont_relEGB10 + 1
-                elif last_group == 'EGB11':
-                    cont_relEGB11 = cont_relEGB11 + 1
-                elif last_group == 'EGB12':
-                    cont_relEGB12 = cont_relEGB11 + 1 
+            if Var_productivity_EGB8 !=0:
+                cont_relEGB8 = cont_relEGB8 + 1
+            if Var_productivity_EGB9 !=0:
+                cont_relEGB9 = cont_relEGB9 + 1
+            if Var_productivity_EGB10 !=0:
+                cont_relEGB10 = cont_relEGB10 + 1
+            if Var_productivity_EGB11 !=0:
+                cont_relEGB11 = cont_relEGB11 + 1
+            if Var_productivity_EGB12 !=0:
+                cont_relEGB12 = cont_relEGB12 + 1 
 
- 
             Var_productivity = 0
+            Var_productivity_EGB8 = 0
+            Var_productivity_EGB9 = 0
+            Var_productivity_EGB10 = 0
+            Var_productivity_EGB11 = 0
+            Var_productivity_EGB12 = 0
+
 
            
         if 'EGB8' in columna_tareas:
@@ -168,14 +180,19 @@ for index, row in df.iterrows():
         Var_productivity = Var_productivity + columna_horas
         if last_group == 'EGB8':
             Productivity_abs_EGB8 = Productivity_abs_EGB8 + columna_horas
+            Var_productivity_EGB8 = Var_productivity_EGB8 + columna_horas
         elif last_group == 'EGB9':
             Productivity_abs_EGB9 = Productivity_abs_EGB9 + columna_horas
+            Var_productivity_EGB9 = Var_productivity_EGB9 + columna_horas
         elif last_group == 'EGB10':
             Productivity_abs_EGB10 = Productivity_abs_EGB10 + columna_horas
+            Var_productivity_EGB10 = Var_productivity_EGB10 + columna_horas
         elif last_group == 'EGB11':
             Productivity_abs_EGB11 = Productivity_abs_EGB11 + columna_horas
+            Var_productivity_EGB11 = Var_productivity_EGB11 + columna_horas
         elif last_group == 'EGB12':
             Productivity_abs_EGB12 = Productivity_abs_EGB12 + columna_horas
+            Var_productivity_EGB12 = Var_productivity_EGB12 + columna_horas
  
    
     elif conditional == 1  and columna_horas != 0 and not 'EGB3' in columna_tareas:
@@ -257,6 +274,12 @@ Productivity_rel_EGB10 = (Productivity_abs_EGB10/148) / cont_relEGB10
 Productivity_rel_EGB11 = (Productivity_abs_EGB11/148) / cont_relEGB11
 Productivity_rel_EGB12 = (Productivity_abs_EGB12/148) / cont_relEGB12
 
+print(cont_relEGB8,
+cont_relEGB9,
+cont_relEGB10,
+cont_relEGB11,
+cont_relEGB12 
+)
 Productivity_abs_EGB8 = (Productivity_abs_EGB8/148) / (cont_EGB8-cont_grupo_EGB8)
 Productivity_abs_EGB9 = (Productivity_abs_EGB9/148) / (cont_EGB9-cont_grupo_EGB9)
 Productivity_abs_EGB10 = (Productivity_abs_EGB10/148) / (cont_EGB10-cont_grupo_EGB10)
