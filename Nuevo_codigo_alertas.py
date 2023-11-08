@@ -14,8 +14,13 @@ import easygui
 import sys
 
 
+#ccbox returns a boolean value 
 def result_button(output):
-    if output == False:
+    if output:
+        #Continue
+        pass 
+    else:
+        #Exit
         msg = easygui.msgbox("You decided to leave the program...", "Exit")
         sys.exit(0)
  
