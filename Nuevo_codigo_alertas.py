@@ -14,7 +14,7 @@ import easygui
 import sys
 
 
-#ccbox returns a boolean value 
+#ccbox retorna un valor booleano 
 def result_button(output):
     if output:
         #Continue
