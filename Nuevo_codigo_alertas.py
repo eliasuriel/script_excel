@@ -24,15 +24,17 @@ def result_button(output):
         msg = easygui.msgbox("You decided to leave the program...", "Exit")
         sys.exit(0)
  
-easygui.buttonbox("Choose your file to be proccessed (Excel File)",choices=["NEXT"])
+# button names
+choices = ["Continue", "Exit"]
+
+result_button(easygui.buttonbox("Choose your file to be proccessed (Excel File)",choices=["NEXT"]))
 #print("Asking for input file")
 root = tk.Tk()
 root.withdraw()
  
 file_path = filedialog.askopenfilename(filetypes=[('Excel files', '*.xlsx')])
 
-# button names
-choices = ["Continue", "Exit"]
+
 
 # Reemplaza 'nombre_del_archivo.xlsx' con el nombre de tu archivo Excel
 excel_file = pd.ExcelFile(file_path)
@@ -270,9 +272,9 @@ People_per_group.append(cont_EGB11-cont_grupo_EGB11)
 People_per_group.append(cont_EGB12-cont_grupo_EGB12)
  
  
-###########################################################
-#                   Archivo Output
-# #########################################################
+##########################################################
+#                   Archivo Output                       #
+##########################################################
    
  
 while True:
