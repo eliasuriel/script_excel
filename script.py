@@ -63,6 +63,11 @@ cont = 0
 cont_anio = 0
 suma_prime = 0
 anio_mes = ""
+palabra = "BE-"
+palabra2 = "PN-"
+condicional = 0
+suma_opx = 0
+
 anio =  int(easygui.enterbox("Type the year"))
 str_anio = str(anio)
 
@@ -102,7 +107,7 @@ str_anio = str(anio)
 #     workbook.save(ruta_completa)        #Guardar el libro
  
 # HOURS_PER_DAY =  easygui.enterbox("How many laboral hours does a day have? (8, 8.25)")
-# #HOURS_PER_DAY = 8.25
+HOURS_PER_DAY = 8.25
 
 
 
@@ -124,7 +129,7 @@ for i in range(numhojas):
     #str easy gui enter box "Cuantos proyectos"
     #num_proyectos = str(easygui.enterbox("How many project do you want to work"))    
 
-    num_proyectos = 1 #num the 
+    num_proyectos = 1 #num the     
     df = df.dropna(subset=[nombrecolumna1, nombrecolumna2])
     column_headers = df_2.columns.tolist() #   
     df_2[column_headers] = df_2[column_headers].fillna(0)
@@ -156,55 +161,56 @@ for i in range(numhojas):
     else:
         anio_mes = "0"
 
-    print(anio_mes)
 
     for col_header in column_headers: #recorre los headers del opx-*89
-        if str(anio) == col_header or str_anio in str(col_header) and anio_mes == str(col_header): #verifica si coincide 2023(o el anio que escriban) o si esta en algun header
+        if str_anio in str(col_header) and anio_mes == str(col_header): #verifica si coincide 2023(o el anio que escriban) o si esta en algun header
             cont_anio += 1
-            print(cont_anio)#nomas era para ver cuanta veces entraba
-            print(col_header)#verificar que si fuera correcta la comparacion
-
-    for j in range(num_proyectos):    
-        proyecto = str(easygui.enterbox("Name of the project you want to work on? (Ford, Singer, tesla, brp, zoox)"))
-        #enterbox "For this project, how many areas"
-        num_areas = 1
-        for h in range (num_areas):
-            area = str(easygui.enterbox("Name of the area you want to work on this project (" + proyecto + ") (NET,CSW, ASW, etc)"))
-            #ano = str(easygui.enterbox("Type the year you want to work on")) 
-
-            print(df_2)
-            print("Columnas de la hoja df_2:", column_headers)
-            #df_2[nom3] = df_2[nom3].fillna(0)
             
-            for index, row in df.iterrows():
-                    columna_tareas = row[nombrecolumna1]
-                    columna_horas = row[nombrecolumna2]    
+            #print(cont_anio)#nomas era para ver cuanta veces entraba
+            #print(col_header)#verificar que si fuera correcta la comparacion
 
-                    #print(columna_tareas)
-                    #print (columna_horas)
-                    cont += 1
-                    if proyecto in str(columna_tareas) and area in str(columna_tareas):
-                        print("entre")
-                        suma_prime = suma_prime + columna_horas 
+            for j in range(num_proyectos):    
+                proyecto = str(easygui.enterbox("Name of the project you want to work on? (Ford, Singer, tesla, brp, zoox)"))
+                #enterbox "For this project, how many areas"
+                num_areas = 1
+                for h in range (num_areas):
+                    area = str(easygui.enterbox("Name of the area you want to work on this project (" + proyecto + ") (NET,CSW, ASW, etc)"))
+                    #ano = str(easygui.enterbox("Type the year you want to work on")) 
 
-            
-                     
-
-            #for index, row in df_2.iterrows():
+                    #print(df_2)
+                    #print("Columnas de la hoja df_2:", column_headers)
+                    #df_2[nom3] = df_2[nom3].fillna(0)
                     
-                    #columna_1 = row[nom1]
-                    #columna_2 = row[nom2]
-                    #columna_3 = row[nom3]
-                    #columna_4 = row[nc]
-                    #print(columna_1)
-                    #print(columna_2)
-                    
-                    #print(columna_3)
-                    #print("anio 2024")
-                    #print(columna_4)
+                    for index, row in df.iterrows():
+                            columna_tareas = row[nombrecolumna1]
+                            columna_horas = row[nombrecolumna2]    
 
+                            #print(columna_tareas)
+                            #print (columna_horas)
+                            cont += 1
+                            if proyecto in str(columna_tareas) and area in str(columna_tareas):
+                                print("entre")
+                                suma_prime = suma_prime + columna_horas
 
+                    for index, row in df_2.iterrows():                    
+                        columna_1 = row[column_headers[0]]
+                        columna_2 = row[col_header]                        
+                        
+                        #print(columna_1)
+                        #print(columna_2)
+
+                        if str(columna_1).startswith(palabra or palabra2):
+                            condicional = 0
+                        
+                        if proyecto in str(columna_1):
+                            condicional = 1
+                        
+                        if condicional == 1 and area in str(columna_1):
+                            suma_opx = suma_opx + columna_2              
+
+                        
 print(suma_prime)
+print(suma_opx * HOURS_PER_DAY)
 
 
 
