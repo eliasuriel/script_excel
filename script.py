@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 import os
@@ -12,30 +11,30 @@ from tkinter import filedialog
 import easygui
 
 
-#easygui.msgbox("Choose your file to be proccessed (Excel File)")
+easygui.msgbox("Welcome. Choose your Excel files with PRIME and OPX hours.")
 #print("Asking for input file")
-#root = tk.Tk()
-#root.withdraw()
+root = tk.Tk()
+root.withdraw()
 
-#file_path = filedialog.askopenfilename()
+easygui.msgbox("Choose your Excel file with Prime data")
+file_path = filedialog.askopenfilename()
+easygui.msgbox("Choose your Excel file with OPX data")
+file_path_opx = filedialog.askopenfilename()
 #file_path = "C:\\Users\\VEU1GA\\Documents\\Visual_Studio\\Script2"
 
-# Reemplaza 'nombre_del_archivo.xlsx' con el nombre de tu archivo Excel
-excel_file = pd.ExcelFile('PRIME.xlsx')
-opx_file = pd.ExcelFile('opx_new.xlsx')
-easygui.msgbox("The file was processed successfully")
+excel_file = pd.ExcelFile(file_path)
+opx_file = pd.ExcelFile(file_path_opx)
+easygui.msgbox("The files were processed successfully")
 
-anio =  int(easygui.enterbox("Type the year"))
+anio =  int(easygui.enterbox("Type the year you want to work on"))
 str_anio = str(anio)
 
 numhojas = 0
 
-numhojas = int(easygui.enterbox("Input the number of the prime sheets (or months) do you want to work on"))
-#numhojas = 1
+
 hojas = []
 hojas_2 = []
-for i in range(numhojas):
-   hojas.append(str(easygui.enterbox("In which prime file sheet (or month) do you want to work? sheet number:"  + str(i + 1))))
+  
 
 #PRIME#
 #hojas.append("Associate_Jan")
@@ -73,7 +72,8 @@ condicional = 0
 suma_opx = 0
 totalopx = 0
 mesopx = ""
-
+res_prime = []
+res_opx = []
 
 
 
@@ -118,8 +118,23 @@ num_columna = 1
 
 
 
-#Imprimir encabezados
-#hoja.cell(row = num_fila)
+#########           Estilos de Celdas      ##################
+# Definir los colores de relleno
+relleno_titulos = PatternFill(start_color="77bedc", end_color="77bedc", fill_type="solid")
+
+#Defenir el estilo de letras
+negritas = Font(bold = True)
+
+celda = hoja["B1"] 
+celda.value = "Hours/day"
+celda.fill = relleno_titulos
+celda.font = negritas
+
+celda = hoja["C1"]
+celda.value = HOURS_PER_DAY
+celda.fill = relleno_titulos
+celda.font = negritas
+
 
 
 
@@ -130,58 +145,110 @@ num_columna = 1
 
 
 
-num_proyectos = int(easygui.enterbox("How many projects do you want to work on this month " + str(hojas[i]) + "?"))
+num_proyectos = int(easygui.enterbox("How many projects do you want to work on?"))
 
-for j in range(num_proyectos):    
-        proyecto = str(easygui.enterbox("Name of the project you want to work on? (Ford, Singer, Tesla, BRP, Zoox)"))
-        num_areas = int(easygui.enterbox("For this project: " + str(proyecto) + "; \n how many areas would you like to analyze?"))
+for j in range(num_proyectos):
+        area = []
+        mes = []
+        hojas = []
+
+        proyecto = str(easygui.enterbox("Name of the " + str(j+1) + "° project you want to work on? (Ford, Singer, Tesla, BRP, Zoox)"))
+        num_areas = int(easygui.enterbox("For this project: " + str(proyecto) + "; \nHow many AREAS would you like to analyze?"))
         #num_areas = 1
-        
-        for h in range (num_areas):
-            
-            area = str(easygui.enterbox("Name of the area you want to work on this project (" + proyecto + ") (NET,CSW, ASW, etc)"))
-            #print(df_2)
-            #print("Columnas de la hoja df_2:", column_headers)
-            #df_2[nom3] = df_2[nom3].fillna(0)
 
-            for i in range(numhojas):
-                df = excel_file.parse(hojas[i])
-                df_2= opx_file.parse(hojas_2[0])
-                
-                easygui.msgbox("Answer the following box as follows, type 1 if you want to work in the month of January, 2 if in the month of February.....")
-                mes = int(easygui.enterbox("Type the month in which you want to work in opx in number (must be the same month as prime)" + "This is the month of prime that you choose before:" + str(hojas[i])))    
-                #num_proyectos = 1 #num the     
-                df = df.dropna(subset=[nombrecolumna1, nombrecolumna2])
-                column_headers = df_2.columns.tolist() #   
-                df_2[column_headers] = df_2[column_headers].fillna(0)
+        numhojas = int(easygui.enterbox("For this project: " + str(proyecto) + "; \nHow many MONTHS would you like to analyze?"))
+        #numhojas = 1
 
-                if mes == 1:
-                    anio_mes = str_anio 
-                elif mes == 2:
-                    anio_mes = str_anio + ".1"
-                elif mes == 3:
-                    anio_mes = str_anio + ".2"
-                elif mes == 4:
-                    anio_mes = str_anio + ".3"
-                elif mes == 5:
-                    anio_mes = str_anio + ".4"
-                elif mes == 6:
-                    anio_mes = str_anio + ".5"
-                elif mes == 7:
-                    anio_mes = str_anio + ".6"
-                elif mes == 8:
-                    anio_mes = str_anio + ".7"
-                elif mes == 9:
-                    anio_mes = str_anio + ".8"
-                elif mes == 10:
-                    anio_mes = str_anio + ".9"
-                elif mes == 11:
-                    anio_mes = str_anio + ".10"
-                elif mes == 12:
-                    anio_mes = str_anio + ".11"
+        nombres_hojas_prime = excel_file.sheet_names
+
+
+        for i in range(numhojas):
+            while True:
+                nombre_hoja = str(easygui.enterbox("In which Prime file sheet (or month) do you want to work? \nSheet #"  + str(i + 1)))
+
+                if nombre_hoja in nombres_hojas_prime:
+                    hojas.append(nombre_hoja)
+                    break
                 else:
-                    anio_mes = "0"
+                    easygui.msgbox("Sheet name was not found in " + file_path + ". \nPlease write it again.")
 
+            while True:
+                num_mes = int(easygui.enterbox("For " + str(hojas[i]) + ":\nType the month number that corresponds to it.\n(e.g. January = 1, February = 2, ...etc)"))
+                if num_mes < 1 or num_mes > 12:
+                    easygui.msgbox(msg="The month number must be a NUMBER between 1 and 12.\nPlease write it again.",title="ERROR", ok_button="I'm Sorry :(")
+                else:
+                    mes.append(num_mes)
+                    break
+
+        for h in range(num_areas):
+            area.append(str(easygui.enterbox("Name of the " + str(h+1) + "° area you want to work on " + proyecto + " project. (NET,CSW, ASW, etc)")))
+
+
+        #Imprimir proyecto
+        num_columna = 2
+        num_fila += 2
+        celda = hoja.cell(row=num_fila, column=num_columna, value=proyecto)
+        celda.fill=relleno_titulos
+        celda.font=negritas
+
+        #Imprimir areas
+        for h in range(num_areas):
+                for k in range(3):
+                    celda = hoja.cell(row=num_fila, column=(1+k+num_columna+3*h), value=area[h])
+                    celda.fill=relleno_titulos
+                celda = hoja.cell(row=num_fila+1, column=(1+num_columna+3*h), value="OPX")
+                celda.fill = relleno_titulos
+
+                celda = hoja.cell(row=num_fila+1, column=(2+num_columna+3*h), value="Prime")
+                celda.fill = relleno_titulos
+
+                celda = hoja.cell(row=num_fila+1, column=(3+num_columna+3*h), value="Relation")
+                celda.fill = relleno_titulos
+        
+        num_fila += 2
+   
+
+        for i in range(numhojas):
+
+            
+            df = excel_file.parse(hojas[i])
+            df_2= opx_file.parse(hojas_2[0])
+                    
+            df = df.dropna(subset=[nombrecolumna1, nombrecolumna2])
+            column_headers = df_2.columns.tolist() #   
+            df_2[column_headers] = df_2[column_headers].fillna(0)
+
+            if mes[i] == 1:
+                anio_mes = str_anio 
+            elif mes[i] == 2:
+                anio_mes = str_anio + ".1"
+            elif mes[i] == 3:
+                anio_mes = str_anio + ".2"
+            elif mes[i] == 4:
+                anio_mes = str_anio + ".3"
+            elif mes[i] == 5:
+                anio_mes = str_anio + ".4"
+            elif mes[i] == 6:
+                anio_mes = str_anio + ".5"
+            elif mes[i] == 7:
+                anio_mes = str_anio + ".6"
+            elif mes[i] == 8:
+                anio_mes = str_anio + ".7"
+            elif mes[i] == 9:
+                anio_mes = str_anio + ".8"
+            elif mes[i] == 10:
+                anio_mes = str_anio + ".9"
+            elif mes[i] == 11:
+                anio_mes = str_anio + ".10"
+            elif mes[i] == 12:
+                anio_mes = str_anio + ".11"
+            else:
+                anio_mes = "0"
+
+
+                 
+                
+            for h in range(num_areas):    
 
                 for col_header in column_headers: #recorre los headers del opx-*89
         
@@ -194,7 +261,7 @@ for j in range(num_proyectos):
                                 #print(columna_tareas)
                                 #print (columna_horas)
                                 cont += 1
-                                if proyecto in str(columna_tareas) and area in str(columna_tareas):
+                                if proyecto in str(columna_tareas) and area[h] in str(columna_tareas):
                                     print("entre")
                                     suma_prime = suma_prime + columna_horas
 
@@ -203,7 +270,9 @@ for j in range(num_proyectos):
                             columna_2 = row[col_header] 
                             if index == 0:
                                 #easygui.msgbox(columna_2)  
-                                mesopx = columna_2                     
+                                mesopx = columna_2
+                                celda = hoja.cell(row=num_fila, column=num_columna, value=mesopx)
+                                celda.fill = relleno_titulos                     
                             
                             #print(columna_1)
                             #print(columna_2)
@@ -214,16 +283,63 @@ for j in range(num_proyectos):
                             if proyecto in str(columna_1):
                                 condicional = 1
                             
-                            if condicional == 1 and area in str(columna_1):
+                            if condicional == 1 and area[h] in str(columna_1):
                                 suma_opx = suma_opx + columna_2*HOURS_PER_DAY     
 
-                easygui.msgbox("Mes Prime: " + str(hojas[i]) + "\nMes OPX: " + str(mesopx) + "\nProyecto: " + str(proyecto) + "\nArea: " + str(area)  + "\nHoras Prime: " + str(suma_prime) + "\nHojas OPX: " + str(suma_opx))
+                #easygui.msgbox("Mes Prime: " + str(hojas[i]) + "\nMes OPX: " + str(mesopx) + "\nProyecto: " + str(proyecto) + "\nArea: " + str(area[h])  + "\nHoras Prime: " + str(suma_prime) + "\nHojas OPX: " + str(suma_opx))
+                
+                resultados = []
+                res_prime.append(suma_prime)
+                res_opx.append(suma_opx) 
+                resultados.append(suma_opx)
+                resultados.append(suma_prime)
+                if suma_opx == 0:
+                    relacion = 0
+                else:
+                    relacion = suma_prime/suma_opx
+                resultados.append(relacion)
+
+                for k in range(3):
+                    celda = hoja.cell(row=num_fila, column=(1+k+num_columna+3*h), value=resultados[k])
+
                 if suma_prime !=0:
                     suma_prime = 0
                 if suma_opx !=0:
                     suma_opx = 0
                     # easygui.msgbox(suma_prime)
                     # easygui.msgbox(suma_opx)
+            num_fila += 1
+
+
+# Ajustar el ancho de las columnas de la tabla
+for columna in hoja.iter_cols(min_col=1, max_col=20):
+    longitud_maxima = 0
+    columna_letra = columna[0].column_letter  # Obtiene la letra de la columna
+    for celda in columna:
+        if celda.value:
+            if celda.data_type == 'n':
+                longitud_celda = 8
+            else:
+                # Calcula la longitud máxima del contenido en la columna
+                longitud_celda = len(str(celda.value))
+            print(longitud_celda)
+            if longitud_celda > longitud_maxima:
+                longitud_maxima = longitud_celda
+ 
+    # Establece el ancho de la columna para ajustarlo al contenido más largo
+    hoja.column_dimensions[columna_letra].width = longitud_maxima +2
+
+
+#Guarda el archivo
+workbook.save(ruta_completa)
+ 
+#Abre el archivo
+if os.path.exists(ruta_completa):
+    easygui.msgbox("Save completed, opening file...")
+    os.startfile(ruta_completa)
+    #os.system(f'start excel "{ruta_completa}"')
+else:
+    easygui.msgbox(f'El archivo "{ruta_completa}" no existe.')
 
 
 
