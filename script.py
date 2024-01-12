@@ -34,6 +34,8 @@ numhojas = 0
 
 hojas = []
 hojas_2 = []
+
+
   
 
 #PRIME#
@@ -60,6 +62,9 @@ nombrecolumna2= "Hours"
 Nombres_Tareas = []
 hours = []
 column_headers = []
+seleccion_hoja = []
+Proyectos = []
+
 
 
 cont = 0
@@ -74,6 +79,7 @@ totalopx = 0
 mesopx = ""
 res_prime = []
 res_opx = []
+Nombres = ''
 
 
 
@@ -99,6 +105,8 @@ if not os.path.exists(ruta_completa):
     workbook = openpyxl.Workbook()      #Crear un nuevo libro
     hoja = workbook.active              #Crear una nueva hoja
     hoja.title = str_anio               #Título de la hoja = anio
+    hoja2 = workbook.active             
+    hoja2.title = "Lista asociados " + str_anio
     workbook.save(ruta_completa)        #Guardar el libro
  
     easygui.msgbox(f"The file {archivo} was created in: {directorio}")
@@ -109,7 +117,9 @@ else:
     hoja = workbook.active              #Crear una nueva hoja
     hoja.title = str_anio               #Título de la hoja = anio
     workbook.save(ruta_completa)        #Guardar el libro
- 
+
+
+
 HOURS_PER_DAY =  float(easygui.enterbox("How many laboral hours does a day have? (8, 8.25...)"))
 #HOURS_PER_DAY = 8.25
 
@@ -143,34 +153,45 @@ celda.font = negritas
 #             Iteraciones y Calculos
 #######################################################
 
-
+area = ["CSW", "NET", "DCOM", "DSW", "TST", "SYS", "ASW"]
+proyectos = ["BRP", "Zoox", "Faraday","Tesla", "Ford", "Singer", "Harley Davidson", "GM", "Lordstwon", "Oshkosh", "Lucid", "Navistar", "Rexroth", "METALSA", "ASNA", "ReCar", "Fisker","Battle_Motors","BYD"]
 
 num_proyectos = int(easygui.enterbox("How many projects do you want to work on?"))
 
+num_columna_2 = 2
+num_fila_2 = 2
+
+celda = hoja2.cell(row=num_fila_2, column=num_columna_2, value="Project")
+celda.fill = relleno_titulos
+celda = hoja2.cell(row=num_fila_2, column=num_columna_2+1, value="Component")
+celda.fill = relleno_titulos
+celda = hoja2.cell(row=num_fila_2, column=num_columna_2+2, value="Name")
+celda.fill = relleno_titulos
+num_fila_2 += 1
+
+
+
 for j in range(num_proyectos):
-        area = []
+        
         mes = []
         hojas = []
 
-        proyecto = str(easygui.enterbox("Name of the " + str(j+1) + "° project you want to work on? (Ford, Singer, Tesla, BRP, Zoox)"))
-        num_areas = int(easygui.enterbox("For this project: " + str(proyecto) + "; \nHow many AREAS would you like to analyze?"))
-        #num_areas = 1
+        seleccion_proyecto = easygui.choicebox("Choose the " + str(j + 1) + "° project do you want to work" , choices=proyectos)
+        proyecto = seleccion_proyecto
 
         numhojas = int(easygui.enterbox("For this project: " + str(proyecto) + "; \nHow many MONTHS would you like to analyze?"))
         #numhojas = 1
 
         nombres_hojas_prime = excel_file.sheet_names
-
+        
 
         for i in range(numhojas):
-            while True:
-                nombre_hoja = str(easygui.enterbox("In which Prime file sheet (or month) do you want to work? \nSheet #"  + str(i + 1)))
-
-                if nombre_hoja in nombres_hojas_prime:
-                    hojas.append(nombre_hoja)
-                    break
-                else:
-                    easygui.msgbox("Sheet name was not found in " + file_path + ". \nPlease write it again.")
+            #nombre_hoja = str(easygui.enterbox("In which Prime file sheet (or month) do you want to work? \nSheet #"  + str(i + 1)))
+            seleccion = easygui.choicebox("In which Prime file sheet (or month) do you want to work?" + str(i + 1), choices=nombres_hojas_prime)
+            hojas.append(seleccion)
+            # Mostrar el resultado
+            #easygui.msgbox(f"Seleccionaste: {seleccion}")
+                
 
             while True:
                 num_mes = int(easygui.enterbox("For " + str(hojas[i]) + ":\nType the month number that corresponds to it.\n(e.g. January = 1, February = 2, ...etc)"))
@@ -180,10 +201,7 @@ for j in range(num_proyectos):
                     mes.append(num_mes)
                     break
 
-        for h in range(num_areas):
-            area.append(str(easygui.enterbox("Name of the " + str(h+1) + "° area you want to work on " + proyecto + " project. (NET,CSW, ASW, etc)")))
-
-
+        
         #Imprimir proyecto
         num_columna = 2
         num_fila += 2
@@ -192,7 +210,7 @@ for j in range(num_proyectos):
         celda.font=negritas
 
         #Imprimir areas
-        for h in range(num_areas):
+        for h in range(len(area)):
                 for k in range(3):
                     celda = hoja.cell(row=num_fila, column=(1+k+num_columna+3*h), value=area[h])
                     celda.fill=relleno_titulos
@@ -248,7 +266,7 @@ for j in range(num_proyectos):
 
                  
                 
-            for h in range(num_areas):    
+            for h in range(len(area)):    
 
                 for col_header in column_headers: #recorre los headers del opx-*89
         
@@ -261,9 +279,22 @@ for j in range(num_proyectos):
                                 #print(columna_tareas)
                                 #print (columna_horas)
                                 cont += 1
+
+                                Nombres = ''
+                                if 'EGB' in columna_tareas:
+                                    Nombres = columna_tareas
+                            
                                 if proyecto in str(columna_tareas) and area[h] in str(columna_tareas):
                                     print("entre")
                                     suma_prime = suma_prime + columna_horas
+                                    Nombres_Tareas.append(Nombres)
+                                    celda = hoja2.cell(row=num_fila_2, column=num_columna_2, value=proyecto)
+                                    celda = hoja2.cell(row=num_fila_2, column=num_columna_2+1, value=area[h])
+                                    celda = hoja2.cell(row=num_fila_2, column=num_columna_2+2, value=Nombres)
+
+
+
+
 
                         for index, row in df_2.iterrows():                    
                             columna_1 = row[column_headers[0]]
@@ -312,7 +343,7 @@ for j in range(num_proyectos):
 
 
 # Ajustar el ancho de las columnas de la tabla
-for columna in hoja.iter_cols(min_col=1, max_col=20):
+for columna in hoja.iter_cols(min_col=2, max_col=23):
     longitud_maxima = 0
     columna_letra = columna[0].column_letter  # Obtiene la letra de la columna
     for celda in columna:
@@ -329,6 +360,24 @@ for columna in hoja.iter_cols(min_col=1, max_col=20):
     # Establece el ancho de la columna para ajustarlo al contenido más largo
     hoja.column_dimensions[columna_letra].width = longitud_maxima +2
 
+# Ajustar el ancho de las columnas de la tabla
+for columna in hoja2.iter_cols(min_col=2, max_col=4):
+    longitud_maxima = 0
+    columna_letra = columna[0].column_letter  # Obtiene la letra de la columna
+    for celda in columna:
+        if celda.value:
+            if celda.data_type == 'n':
+                longitud_celda = 8
+            else:
+                # Calcula la longitud máxima del contenido en la columna
+                longitud_celda = len(str(celda.value))
+            print(longitud_celda)
+            if longitud_celda > longitud_maxima:
+                longitud_maxima = longitud_celda
+ 
+    # Establece el ancho de la columna para ajustarlo al contenido más largo
+    hoja2.column_dimensions[columna_letra].width = longitud_maxima +2
+
 
 #Guarda el archivo
 workbook.save(ruta_completa)
@@ -340,12 +389,3 @@ if os.path.exists(ruta_completa):
     #os.system(f'start excel "{ruta_completa}"')
 else:
     easygui.msgbox(f'El archivo "{ruta_completa}" no existe.')
-
-
-
-
-  
-
-            
-
-                        
