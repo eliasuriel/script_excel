@@ -103,10 +103,10 @@ print(ruta_completa)
  
 if not os.path.exists(ruta_completa):
     workbook = openpyxl.Workbook()      #Crear un nuevo libro
-    hoja = workbook.active              #Crear una nueva hoja
+    hoja = workbook.active            #Crear una nueva hoja
     hoja.title = str_anio               #Título de la hoja = anio
-    hoja2 = workbook.active             
-    hoja2.title = "Lista asociados " + str_anio
+    hoja2 = workbook.create_sheet(title="Lista asociados " + str_anio)             
+    #hoja2.title = "Lista asociados " + str_anio
     workbook.save(ruta_completa)        #Guardar el libro
  
     easygui.msgbox(f"The file {archivo} was created in: {directorio}")
@@ -114,8 +114,10 @@ if not os.path.exists(ruta_completa):
 else:
     easygui.msgbox(f"The file {archivo} already exists in: {directorio}")
     workbook = openpyxl.load_workbook(ruta_completa)
-    hoja = workbook.active              #Crear una nueva hoja
+    hoja = workbook.create_sheet              #Crear una nueva hoja
     hoja.title = str_anio               #Título de la hoja = anio
+    hoja2 = workbook.create_sheet             
+    hoja2.title = "Lista asociados " + str_anio
     workbook.save(ruta_completa)        #Guardar el libro
 
 
@@ -156,16 +158,34 @@ celda.font = negritas
 area = ["CSW", "NET", "DCOM", "DSW", "TST", "SYS", "ASW"]
 proyectos = ["BRP", "Zoox", "Faraday","Tesla", "Ford", "Singer", "Harley Davidson", "GM", "Lordstwon", "Oshkosh", "Lucid", "Navistar", "Rexroth", "METALSA", "ASNA", "ReCar", "Fisker","Battle_Motors","BYD"]
 
+gente_sin_egb = [
+    "Humberto Chávez Chávez",
+    "Ricardo Adolfo del Razo Real",
+    "Atlahuac", 
+    "Aguirre Vivo Mayra Fernanda", 
+    "Diaz Paredes Jose Ronaldo",
+    "Perez Mejia Marcelo Armando", 
+    "Dominguez Barba Jose Ramon", 
+    "Centeno Alcaraz Jaime Alberto",
+    "Perez Fonseca Erick Zahid"
+    ]
+
 num_proyectos = int(easygui.enterbox("How many projects do you want to work on?"))
 
 num_columna_2 = 2
 num_fila_2 = 2
 
+Nombres = ''
+
 celda = hoja2.cell(row=num_fila_2, column=num_columna_2, value="Project")
 celda.fill = relleno_titulos
-celda = hoja2.cell(row=num_fila_2, column=num_columna_2+1, value="Component")
+celda = hoja2.cell(row=num_fila_2, column=num_columna_2+1, value="Month")
 celda.fill = relleno_titulos
-celda = hoja2.cell(row=num_fila_2, column=num_columna_2+2, value="Name")
+celda = hoja2.cell(row=num_fila_2, column=num_columna_2+2, value="Component")
+celda.fill = relleno_titulos
+celda = hoja2.cell(row=num_fila_2, column=num_columna_2+3, value="Name")
+celda.fill = relleno_titulos
+celda = hoja2.cell(row=num_fila_2, column=num_columna_2+4, value="Activity")
 celda.fill = relleno_titulos
 num_fila_2 += 1
 
@@ -275,22 +295,24 @@ for j in range(num_proyectos):
                         for index, row in df.iterrows():
                                 columna_tareas = row[nombrecolumna1]
                                 columna_horas = row[nombrecolumna2]    
-
-                                #print(columna_tareas)
-                                #print (columna_horas)
-                                cont += 1
-
-                                Nombres = ''
-                                if 'EGB' in columna_tareas:
+                     
+                                
+                                if ('EGB' in columna_tareas) or (columna_tareas in gente_sin_egb):# or "P_" not in columna_tareas or "N_" not in columna_tareas or "Other" not in columna_tareas:
                                     Nombres = columna_tareas
+                                  
+                                    
                             
                                 if proyecto in str(columna_tareas) and area[h] in str(columna_tareas):
-                                    print("entre")
                                     suma_prime = suma_prime + columna_horas
                                     Nombres_Tareas.append(Nombres)
                                     celda = hoja2.cell(row=num_fila_2, column=num_columna_2, value=proyecto)
-                                    celda = hoja2.cell(row=num_fila_2, column=num_columna_2+1, value=area[h])
-                                    celda = hoja2.cell(row=num_fila_2, column=num_columna_2+2, value=Nombres)
+                                    celda = hoja2.cell(row=num_fila_2, column=num_columna_2+1, value=hojas[i])
+                                    celda = hoja2.cell(row=num_fila_2, column=num_columna_2+2, value=area[h])
+                                    celda = hoja2.cell(row=num_fila_2, column=num_columna_2+3, value=Nombres)
+                                    celda = hoja2.cell(row=num_fila_2, column=num_columna_2+4, value=columna_tareas)
+                                    #Nombres = " "
+                                    num_fila_2 += 1
+                                    
 
 
 
@@ -337,11 +359,31 @@ for j in range(num_proyectos):
                     suma_prime = 0
                 if suma_opx !=0:
                     suma_opx = 0
-                    # easygui.msgbox(suma_prime)
-                    # easygui.msgbox(suma_opx)
             num_fila += 1
 
 
+
+######### HACER TABLA HOJA 2 #################
+existing_tables = hoja2.tables
+table_name = 'Tabla_general'
+ 
+if table_name in existing_tables:
+    # Si la tabla ya existe, la eliminamos
+    hoja2._tables.remove(existing_tables[table_name])
+ 
+ 
+#Crea una nueva tabla
+table = Table(displayName=table_name, ref=("B2:F")+str(num_fila_2 - 1))
+style = TableStyleInfo(
+    name="TableStyleMedium9", showFirstColumn=False,
+    showLastColumn=False, showRowStripes=False, showColumnStripes=True)
+table.tableStyleInfo = style
+hoja2.add_table(table)
+
+
+
+
+############# Ajustar ancho de columnas ####################
 # Ajustar el ancho de las columnas de la tabla
 for columna in hoja.iter_cols(min_col=2, max_col=23):
     longitud_maxima = 0
@@ -353,15 +395,15 @@ for columna in hoja.iter_cols(min_col=2, max_col=23):
             else:
                 # Calcula la longitud máxima del contenido en la columna
                 longitud_celda = len(str(celda.value))
-            print(longitud_celda)
+            
             if longitud_celda > longitud_maxima:
                 longitud_maxima = longitud_celda
  
     # Establece el ancho de la columna para ajustarlo al contenido más largo
     hoja.column_dimensions[columna_letra].width = longitud_maxima +2
 
-# Ajustar el ancho de las columnas de la tabla
-for columna in hoja2.iter_cols(min_col=2, max_col=4):
+# Ajustar el ancho de las columnas de la tabla 2
+for columna in hoja2.iter_cols(min_col=2, max_col=6):
     longitud_maxima = 0
     columna_letra = columna[0].column_letter  # Obtiene la letra de la columna
     for celda in columna:
@@ -371,12 +413,12 @@ for columna in hoja2.iter_cols(min_col=2, max_col=4):
             else:
                 # Calcula la longitud máxima del contenido en la columna
                 longitud_celda = len(str(celda.value))
-            print(longitud_celda)
+            
             if longitud_celda > longitud_maxima:
                 longitud_maxima = longitud_celda
  
     # Establece el ancho de la columna para ajustarlo al contenido más largo
-    hoja2.column_dimensions[columna_letra].width = longitud_maxima +2
+    hoja2.column_dimensions[columna_letra].width = longitud_maxima +4
 
 
 #Guarda el archivo
