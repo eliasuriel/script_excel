@@ -24,6 +24,59 @@ file_path_opx = filedialog.askopenfilename()
 
 excel_file = pd.ExcelFile(file_path)
 opx_file = pd.ExcelFile(file_path_opx)
+
+######## HACER CAMBIOS EN ARCHIVO OPX PARA CELDAS COMBINADAS #######
+
+hoja_nombre = opx_file.sheet_names[0]
+
+# Obtener el DataFrame de la hoja especificada
+df_2 = opx_file.parse(hoja_nombre)
+
+# Crear un objeto openpyxl Workbook a partir del DataFrame
+workbook_de_paso = openpyxl.Workbook()
+hoja_prueba = workbook_de_paso.active
+
+# Copiar los datos del DataFrame a la hoja de openpyxl
+for i, row in enumerate(df_2.values):
+    for j, value in enumerate(row):
+        hoja_prueba.cell(row=i+1, column=j+1, value=value)
+
+# Descombinar las celdas en la hoja
+for rango in hoja_prueba.merged_cells.ranges:
+    # Obtener el valor de la celda combinada
+    valor_celda_combinada = hoja_prueba[rango.start_cell].value
+    
+    # Iterar sobre cada celda en el rango y asignarle el mismo título
+    for celda in rango.cells:
+        hoja_prueba[celda].value = valor_celda_combinada
+
+celda1 = hoja_prueba['A1']
+celda2 = hoja_prueba['B1']
+celda = hoja_prueba.cell(row=2, column=1, value=celda1.value)
+celda = hoja_prueba.cell(row=2, column=2, value=celda2.value)
+hoja_prueba.delete_rows(1)
+
+
+celda1 = hoja_prueba['C1']
+if '202' in celda1.value:
+    for i in range(11):
+        celda = hoja_prueba.cell(row=1, column=4+i, value=celda1.value +"."+str(i+1))
+
+celda2 = hoja_prueba['O1']
+if '202' in celda1.value:
+    for i in range(11):
+        celda = hoja_prueba.cell(row=1, column=16+i, value=celda2.value +"."+str(i+1))
+
+archivos = str(easygui.enterbox(msg="Write a name to the modified OPX file"))  
+archivo  = archivos + ".xlsx"
+easygui.msgbox("Enter the folder where you want the modified OPX file to be stored ")
+directorio=str(easygui.diropenbox()) 
+ruta_completa = os.path.join(directorio, archivo)
+workbook_de_paso.save(ruta_completa)
+
+opx_file = pd.ExcelFile(ruta_completa)
+
+##### CONTINUAR CON EL PROCESO ##########3
 easygui.msgbox("The files were processed successfully")
 
 anio =  int(easygui.enterbox("Type the year you want to work on"))
@@ -48,8 +101,7 @@ hojas_2 = []
 #hojas.append("Associate_July")
 
 #OPX
-hojas_2.append("Table")
-hojas_2.append("Sheet1")
+hojas_2 = opx_file.sheet_names
 
 #We are going to use only two names, because is the same name of the two columns for all the sheets
 #nombrecolumna1 = str(easygui.enterbox("Name of the first column to work on? (coworkers,name of the jobs)"))
@@ -187,6 +239,8 @@ celda = hoja2.cell(row=num_fila_2, column=num_columna_2+3, value="Name")
 celda.fill = relleno_titulos
 celda = hoja2.cell(row=num_fila_2, column=num_columna_2+4, value="Activity")
 celda.fill = relleno_titulos
+celda = hoja2.cell(row=num_fila_2, column=num_columna_2+5, value="Hours Reported")
+celda.fill = relleno_titulos
 num_fila_2 += 1
 
 
@@ -310,6 +364,7 @@ for j in range(num_proyectos):
                                     celda = hoja2.cell(row=num_fila_2, column=num_columna_2+2, value=area[h])
                                     celda = hoja2.cell(row=num_fila_2, column=num_columna_2+3, value=Nombres)
                                     celda = hoja2.cell(row=num_fila_2, column=num_columna_2+4, value=columna_tareas)
+                                    celda = hoja2.cell(row=num_fila_2, column=num_columna_2+5, value=columna_horas)
                                     #Nombres = " "
                                     num_fila_2 += 1
                                     
@@ -373,7 +428,7 @@ if table_name in existing_tables:
  
  
 #Crea una nueva tabla
-table = Table(displayName=table_name, ref=("B2:F")+str(num_fila_2 - 1))
+table = Table(displayName=table_name, ref=("B2:G")+str(num_fila_2 - 1))
 style = TableStyleInfo(
     name="TableStyleMedium9", showFirstColumn=False,
     showLastColumn=False, showRowStripes=False, showColumnStripes=True)
@@ -403,7 +458,7 @@ for columna in hoja.iter_cols(min_col=2, max_col=23):
     hoja.column_dimensions[columna_letra].width = longitud_maxima +2
 
 # Ajustar el ancho de las columnas de la tabla 2
-for columna in hoja2.iter_cols(min_col=2, max_col=6):
+for columna in hoja2.iter_cols(min_col=2, max_col=7):
     longitud_maxima = 0
     columna_letra = columna[0].column_letter  # Obtiene la letra de la columna
     for celda in columna:
