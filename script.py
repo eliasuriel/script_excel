@@ -10,6 +10,7 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 import tkinter as tk
 from tkinter import filedialog
 import easygui
+import random
 
 ###############################################
 #  1. Importacion y modificacion de archivos  #
@@ -85,20 +86,35 @@ if '202' in celda2.value:
         # Asigna a las celdas despues del anio, su valor mas su identificador decimal
         celda = hoja_prueba.cell(row=1, column=16+i, value=celda2.value +"."+str(i+1))
 
-# Solicitar al usuario un nombre para el archivo modificado OPX
-archivos = str(easygui.enterbox(msg="Escribe un nombre para el archivo OPX modificado"))
+
+#### Nombre del archivo de SALIDA ###
+num_random = random.randint(1,999)
+archivos = "Output-" + str(num_random)
+#archivos = str(easygui.enterbox(msg="Escribe un nombre para el archivo de salida"))
 archivo  = archivos + ".xlsx"
 
-# Solicitar al usuario la carpeta donde desea guardar el archivo modificado OPX
-easygui.msgbox("Ingresa la carpeta donde deseas guardar el archivo OPX modificado")
-directorio = str(easygui.diropenbox()) 
+# Solicitar al usuario la carpeta donde desea guardar el archivo de salida
+easygui.msgbox("Ingresa la carpeta donde deseas guardar el archivo de salida")
+directorio = str(easygui.diropenbox())
+
+# Crear la ruta completa para el archivo de salida
 ruta_completa = os.path.join(directorio, archivo)
+print(ruta_completa)
+
+
+# Solicitar al usuario un nombre para el archivo modificado OPX
+#archivos_temp = str(easygui.enterbox(msg="Escribe un nombre para el archivo OPX modificado"))
+
+archivos_temp = "OPX_modified-" + str(num_random)
+archivo_temp  = archivos_temp + ".xlsx"
+ 
+ruta_completa_temp = os.path.join(directorio, archivo_temp)
 
 # Guardar el Workbook modificado en la nueva ruta
-workbook_de_paso.save(ruta_completa)
+workbook_de_paso.save(ruta_completa_temp)
 
 # Crear un nuevo objeto ExcelFile a partir del archivo modificado OPX
-opx_file = pd.ExcelFile(ruta_completa)
+opx_file = pd.ExcelFile(ruta_completa_temp)
 
 # Continuar con el proceso
 easygui.msgbox("Los archivos fueron procesados exitosamente")
@@ -152,16 +168,7 @@ Nombres = ''
 #   3. Creacion Archivo Output         #
 ########################################
 # Solicitar al usuario un nombre para el archivo de salida
-archivos = str(easygui.enterbox(msg="Escribe un nombre para el archivo de salida"))
-archivo  = archivos + ".xlsx"
 
-# Solicitar al usuario la carpeta donde desea guardar el archivo de salida
-easygui.msgbox("Ingresa la carpeta donde deseas guardar el archivo de salida")
-directorio = str(easygui.diropenbox())
-
-# Crear la ruta completa para el archivo de salida
-ruta_completa = os.path.join(directorio, archivo)
-print(ruta_completa)
 
 # Verificar si el archivo de salida ya existe
 if not os.path.exists(ruta_completa):
@@ -256,7 +263,7 @@ num_fila_2 += 1
 #######################################
 num_proyectos = 0
 
-
+#Arreglo que contiene los nombres de las hojas del PRIME
 meses = [
     "Associate_Jan",
     "Associate_Feb",
@@ -272,14 +279,19 @@ meses = [
     "Associate_Dec"
 ]
 
+#Se le pide al usuario que seleccione los proyectos
 seleccion_proyecto = easygui.multchoicebox(f"Selecciona en qué proyectos deseas trabajar?","Proyectos",proyectos)
 num_proyectos = len(seleccion_proyecto)
+
 # Obtener los nombres de las hojas (o meses) del archivo Prime
 nombres_hojas_prime = excel_file.sheet_names
 
-contnum = 0
 
 while True:
+    seleccion_hoja = []
+    numhojas = 0
+    contnum = 0
+
     seleccion_hoja = easygui.multchoicebox(f"Selecciona en qué meses del archivo Prime deseas trabajar? ","Meses",meses)
     numhojas = len(seleccion_hoja)
     
@@ -290,12 +302,6 @@ while True:
             easygui.msgbox("El mes " +str(seleccion_hoja[a]) + " no se encontró en archivo PRIME", "ERROR")
     if contnum == numhojas:
         break
-
-
-            
-            
-    
-
 
    
 # Iterar sobre el número de proyectos ingresado por el usuario
@@ -330,7 +336,7 @@ for j in range(num_proyectos):
     celda.fill = relleno_titulos
     celda.font = negritas
 
-    # Imprimir áreas en la hoja principal
+    # Imprimir componentes en la hoja principal
     for h in range(len(area)):
         for k in range(3):
             # Imprimir el nombre del área en las celdas correspondientes
@@ -477,6 +483,9 @@ for j in range(num_proyectos):
                 # Incrementar el número de fila para la siguiente iteración
         num_fila += 1
 
+##############################################
+#       6. Dar formato a la Hoja             #
+##############################################
 
 # Hacer una tabla en la hoja secundaria
 existing_tables = hoja2.tables
@@ -496,7 +505,7 @@ hoja2.add_table(table)
 
 
 # Ajustar el ancho de las columnas en la hoja principal
-for columna in hoja.iter_cols(min_col=2, max_col=23):
+for columna in hoja.iter_cols(min_col=2, max_col=2+(len(area)*3)):
     longitud_maxima = 0
     columna_letra = columna[0].column_letter  # Obtener la letra de la columna
     for celda in columna:
@@ -513,6 +522,7 @@ for columna in hoja.iter_cols(min_col=2, max_col=23):
  
     # Establecer el ancho de la columna para ajustarlo al contenido más largo
     hoja.column_dimensions[columna_letra].width = longitud_maxima + 2
+
 
 # Ajustar el ancho de las columnas en la hoja secundaria
 for columna in hoja2.iter_cols(min_col=2, max_col=7):
@@ -533,10 +543,21 @@ for columna in hoja2.iter_cols(min_col=2, max_col=7):
     # Establecer el ancho de la columna para ajustarlo al contenido más largo
     hoja2.column_dimensions[columna_letra].width = longitud_maxima + 4
 
-# Guardar el archivo
+#######################################
+#       7. Ajustes finales            #
+#######################################
+
+# Guardar el archivo de salida
 workbook.save(ruta_completa)
+
+# Eliminar el OPX modificado
+workbook_de_paso.close()
+opx_file.close()
+if os.path.exists(ruta_completa_temp):
+    # Borrar el archivo
+    os.remove(ruta_completa_temp) 
  
-# Abrir el archivo si existe
+# Abrir el archivo de salida si existe
 if os.path.exists(ruta_completa):
     easygui.msgbox("Save completed, opening file...")
     os.startfile(ruta_completa)
