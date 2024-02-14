@@ -206,18 +206,56 @@ for index, row in df.iterrows():
     columna_black_list = row[nombrecolumna3]
 
     #print(columna_black_list)
+    es_persona = any(elemento in columna_tareas for elemento in Groups)
+
     
     
-    if 'EGB' in columna_tareas and 'EGB3' not in columna_tareas and columna_tareas not in bl_names:
-        cont = cont + 1
-        Nombres_Tareas.append(columna_tareas)
-        hours.append(columna_horas)
-        conditional = 1
-        if columna_horas == 0:
-            cont_grupo = cont_grupo + 1
-       
-   
-        if cont > 1:
+    if es_persona: #'EGB' in columna_tareas and 'EGB3' not in columna_tareas and columna_tareas not in bl_names:
+        
+        conditional = 0
+
+        if columna_tareas not in bl_names:
+            cont = cont + 1
+            Nombres_Tareas.append(columna_tareas)
+            hours.append(columna_horas)
+            conditional = 1
+            if columna_horas == 0:
+                cont_grupo = cont_grupo + 1
+
+            if 'EGB8' in columna_tareas:
+                EGB_Group.append('EGB8')
+                last_group = 'EGB8'
+                cont_EGB8 = cont_EGB8 + 1
+                if columna_horas == 0:
+                    cont_grupo_EGB8 = cont_grupo_EGB8+ 1
+            elif 'EGB9' in columna_tareas:
+                EGB_Group.append('EGB9')
+                last_group = 'EGB9'
+                cont_EGB9 = cont_EGB9 + 1
+                if columna_horas == 0:
+                    cont_grupo_EGB9 = cont_grupo_EGB9+ 1
+            elif 'EGB10' in columna_tareas:
+                EGB_Group.append('EGB10')
+                last_group = 'EGB10'
+                cont_EGB10 = cont_EGB10 + 1
+                if columna_horas == 0:
+                    cont_grupo_EGB10 = cont_grupo_EGB10 + 1
+            elif 'EGB11' in columna_tareas:
+                EGB_Group.append('EGB11')
+                last_group = 'EGB11'
+                cont_EGB11 = cont_EGB11 + 1
+                if columna_horas == 0:
+                    cont_grupo_EGB11 = cont_grupo_EGB11 + 1
+            elif 'EGB12' in columna_tareas:
+                EGB_Group.append('EGB12')
+                last_group = 'EGB12'
+                cont_EGB12 = cont_EGB12 + 1
+                if columna_horas == 0:
+                    cont_grupo_EGB12 = cont_grupo_EGB12 + 1
+            else:
+                EGB_Group.append(' ')
+
+        if cont > 1 and conditional == 1:
             Productivity.append(Var_productivity/148)
             if Var_productivity != 0:
                 cont_rel = cont_rel + 1
@@ -239,41 +277,13 @@ for index, row in df.iterrows():
             Var_productivity_EGB10 = 0
             Var_productivity_EGB11 = 0
             Var_productivity_EGB12 = 0
+
+        if columna_tareas in bl_names:
+            conditional = 0
+            last_group = ' '
  
  
            
-        if 'EGB8' in columna_tareas:
-            EGB_Group.append('EGB8')
-            last_group = 'EGB8'
-            cont_EGB8 = cont_EGB8 + 1
-            if columna_horas == 0:
-                cont_grupo_EGB8 = cont_grupo_EGB8+ 1
-        elif 'EGB9' in columna_tareas:
-            EGB_Group.append('EGB9')
-            last_group = 'EGB9'
-            cont_EGB9 = cont_EGB9 + 1
-            if columna_horas == 0:
-                cont_grupo_EGB9 = cont_grupo_EGB9+ 1
-        elif 'EGB10' in columna_tareas:
-            EGB_Group.append('EGB10')
-            last_group = 'EGB10'
-            cont_EGB10 = cont_EGB10 + 1
-            if columna_horas == 0:
-                cont_grupo_EGB10 = cont_grupo_EGB10 + 1
-        elif 'EGB11' in columna_tareas:
-            EGB_Group.append('EGB11')
-            last_group = 'EGB11'
-            cont_EGB11 = cont_EGB11 + 1
-            if columna_horas == 0:
-                cont_grupo_EGB11 = cont_grupo_EGB11 + 1
-        elif 'EGB12' in columna_tareas:
-            EGB_Group.append('EGB12')
-            last_group = 'EGB12'
-            cont_EGB12 = cont_EGB12 + 1
-            if columna_horas == 0:
-                cont_grupo_EGB12 = cont_grupo_EGB12 + 1
-        else:
-            EGB_Group.append(' ')
  
     elif columna_tareas.startswith("   P_") and conditional == 1 and columna_horas != 0:
         Nombres_Tareas.append(columna_tareas)
@@ -297,16 +307,18 @@ for index, row in df.iterrows():
             Productivity_abs_EGB12 = Productivity_abs_EGB12 + columna_horas
             Var_productivity_EGB12 = Var_productivity_EGB12 + columna_horas
  
-   
-    elif conditional == 1  and columna_horas != 0 and not 'EGB3' in columna_tareas:
+    elif 'EGB3' in columna_tareas or (columna_tareas.endswith('-MS)') or columna_tareas.endswith('-MX)') or columna_tareas.endswith('-SX)')):
+        print(columna_tareas)
+        conditional = 0
+        last_group = ' '   
+        
+    elif conditional == 1  and columna_horas != 0 and  'EGB3' not in columna_tareas:
         Nombres_Tareas.append(columna_tareas)
         hours.append(columna_horas)
         EGB_Group.append(' ')
  
    
-    elif 'EGB3' in columna_tareas or (columna_tareas.endswith('-MS)') or columna_tareas.endswith('-MX)') or columna_tareas.endswith('-SX)')):
-        conditional = 0
-        last_group = ' '
+
 
   
 Productivity.append(Var_productivity/148)
@@ -398,12 +410,12 @@ TOTAL_HOURS = HOURS_PER_DAY*WORK_DAYS
 hoja['I2'] = TOTAL_HOURS
  
 Productivity_abs = (Productivity_sum/148) / (cont-cont_grupo)
-print(cont_relEGB8,
-cont_relEGB9,
-cont_relEGB10,
-cont_relEGB11,
-cont_relEGB12
-)
+# print(cont_relEGB8,
+# cont_relEGB9,
+# cont_relEGB10,
+# cont_relEGB11,
+# cont_relEGB12
+# )
 
 Productivity_rel = (Productivity_sum/148) 
 
@@ -414,7 +426,7 @@ Productivity_rel_EGB11 = (Productivity_abs_EGB11/148)
 Productivity_rel_EGB12 = (Productivity_abs_EGB12/148)
 
 
-print(cont_rel)
+#print(cont_rel)
 if cont_rel != 0:
     Productivity_rel /= cont_rel
 
@@ -517,7 +529,7 @@ for i in range (5):
     celda.value = People_per_group[i]
  
 #Imprime equipos
-for i in range (5):
+for i in range (len(Groups)):
     celda = hoja.cell(row = i+15, column = 10, value = Groups[i])
    
  
@@ -537,7 +549,7 @@ for filas, contenido in enumerate(EGB_Group, start=1):
 #Imprimir Productividad
 counter = 0
 for filas, contenido in enumerate(Nombres_Tareas, start=1):
-    if 'EGB' in contenido:      
+    if 'EGB' in contenido and len(Productivity) > counter:      
        hoja.cell(row=filas+1, column=3, value=Productivity[counter])      
        counter +=1
      
@@ -672,7 +684,8 @@ for i in range (6):
             celda.font = negritas
        
  
-   
+workbook.save(ruta_completa)
+  
  
  
  
