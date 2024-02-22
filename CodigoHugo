@@ -182,6 +182,18 @@ while True:
 #easygui.msgbox(WORK_DAYS, title="Días de trabajo", ok_button="NICE")
 #result_button(easygui.ccbox(WORK_DAYS, "", choices))
 
+while True:
+    PRODUCTIVITY_HOURS = easygui.enterbox("How many hours for productivity? (148, 156..., etc)")
+    try:
+        PRODUCTIVITY_HOURS = int(PRODUCTIVITY_HOURS)
+        if PRODUCTIVITY_HOURS > 0:
+            break
+        else:
+            easygui.msgbox("Invalid input. Please enter a positive number.", "Invalid Input")
+    except ValueError:
+        easygui.msgbox("Invalid input. Please enter a valid number.", "Invalid Input")
+
+
 
 cont_prueba = 0
 bl_names = []
@@ -256,7 +268,7 @@ for index, row in df.iterrows():
                 EGB_Group.append(' ')
 
         if cont > 1 and conditional == 1:
-            Productivity.append(Var_productivity/148)
+            Productivity.append(Var_productivity/PRODUCTIVITY_HOURS)
             if Var_productivity != 0:
                 cont_rel = cont_rel + 1
  
@@ -321,7 +333,7 @@ for index, row in df.iterrows():
 
 
   
-Productivity.append(Var_productivity/148)
+Productivity.append(Var_productivity/PRODUCTIVITY_HOURS)
 
 if Var_productivity != 0:
     cont_rel += 1
@@ -403,13 +415,14 @@ hoja['D1'] = 'Comments'
 hoja['E1'] = 'EGB Group'
 hoja['G1'] = 'Days'
 hoja['G2'] = WORK_DAYS
-hoja['H1'] = 'Hr x day'
+hoja['H1'] = 'Hours x day'
 hoja['H2'] = HOURS_PER_DAY
-hoja['I1'] = 'Total hrs'
-TOTAL_HOURS = HOURS_PER_DAY*WORK_DAYS
-hoja['I2'] = TOTAL_HOURS
+hoja['I1'] = '100% Productiviy hours'
+hoja['I2'] = PRODUCTIVITY_HOURS
+
+
  
-Productivity_abs = (Productivity_sum/148) / (cont-cont_grupo)
+Productivity_abs = (Productivity_sum/PRODUCTIVITY_HOURS) / (cont-cont_grupo)
 # print(cont_relEGB8,
 # cont_relEGB9,
 # cont_relEGB10,
@@ -417,13 +430,13 @@ Productivity_abs = (Productivity_sum/148) / (cont-cont_grupo)
 # cont_relEGB12
 # )
 
-Productivity_rel = (Productivity_sum/148) 
+Productivity_rel = (Productivity_sum/PRODUCTIVITY_HOURS) 
 
-Productivity_rel_EGB8 = (Productivity_abs_EGB8/148) 
-Productivity_rel_EGB9 = (Productivity_abs_EGB9/148) 
-Productivity_rel_EGB10 = (Productivity_abs_EGB10/148) 
-Productivity_rel_EGB11 = (Productivity_abs_EGB11/148) 
-Productivity_rel_EGB12 = (Productivity_abs_EGB12/148)
+Productivity_rel_EGB8 = (Productivity_abs_EGB8/PRODUCTIVITY_HOURS) 
+Productivity_rel_EGB9 = (Productivity_abs_EGB9/PRODUCTIVITY_HOURS) 
+Productivity_rel_EGB10 = (Productivity_abs_EGB10/PRODUCTIVITY_HOURS) 
+Productivity_rel_EGB11 = (Productivity_abs_EGB11/PRODUCTIVITY_HOURS) 
+Productivity_rel_EGB12 = (Productivity_abs_EGB12/PRODUCTIVITY_HOURS)
 
 
 #print(cont_rel)
@@ -446,11 +459,11 @@ if cont_relEGB12 != 0:
     Productivity_rel_EGB12 /= cont_relEGB12
     
 
-Productivity_abs_EGB8 = (Productivity_abs_EGB8/148) 
-Productivity_abs_EGB9 = (Productivity_abs_EGB9/148) 
-Productivity_abs_EGB10 = (Productivity_abs_EGB10/148) 
-Productivity_abs_EGB11 = (Productivity_abs_EGB11/148) 
-Productivity_abs_EGB12 = (Productivity_abs_EGB12/148) 
+Productivity_abs_EGB8 = (Productivity_abs_EGB8/PRODUCTIVITY_HOURS) 
+Productivity_abs_EGB9 = (Productivity_abs_EGB9/PRODUCTIVITY_HOURS) 
+Productivity_abs_EGB10 = (Productivity_abs_EGB10/PRODUCTIVITY_HOURS) 
+Productivity_abs_EGB11 = (Productivity_abs_EGB11/PRODUCTIVITY_HOURS) 
+Productivity_abs_EGB12 = (Productivity_abs_EGB12/PRODUCTIVITY_HOURS) 
 
 cont_absEGB8 = cont_EGB8-cont_grupo_EGB8
 cont_absEGB9 = cont_EGB9-cont_grupo_EGB9
@@ -490,19 +503,25 @@ Productivity_rel_array.append(Productivity_rel_EGB11)
 Productivity_rel_array.append(Productivity_rel_EGB12)
  
 #Resultados
-hoja['H5'] = 'High Value (+10%)'
-HIGH_VALUE = TOTAL_HOURS*1.1
-hoja['H6'] = HIGH_VALUE
-hoja['I5'] = 'Low Value (-5%)'
+hoja['H5'] = 'Total hrs'
+TOTAL_HOURS = HOURS_PER_DAY*WORK_DAYS
+hoja['H6'] = TOTAL_HOURS
+
+hoja['G5'] = 'Low Hours Value (-5%)'
 LOW_VALUE = TOTAL_HOURS*0.95
-hoja['I6'] = LOW_VALUE
+hoja['G6'] = LOW_VALUE
+
+hoja['I5'] = 'High Hours Value (+10%)'
+HIGH_VALUE = TOTAL_HOURS*1.1
+hoja['I6'] = HIGH_VALUE
+
  
-hoja['G9'] = 'High Productivity'
-hoja['G10'] = '> 85%'
+hoja['I9'] = 'High Productivity'
+hoja['I10'] = '> 85%'
 hoja['H9'] = 'Med Productivity'
 hoja['H10'] = '75 % - 85 %'
-hoja['I9'] = 'Low Productivity'
-hoja['I10'] = '< 75%'
+hoja['G9'] = 'Low Productivity'
+hoja['G10'] = '< 75%'
  
 hoja['G13'] = 'Qty People'
 hoja['G14'] = (cont - cont_grupo)
@@ -612,25 +631,30 @@ for i in range (9):
         celda.fill = relleno_verde__titulos
         celda.font = negritas
  
-#Days, hours per days, total hrs
+#Days, hours per days, 100% productivity
 for i in range (3):
     celda = hoja.cell(row = 2, column = i+7)
     celda.fill = relleno_amarillo
  
 #High and low hours values headers
-for i in range (2):
-    celda = hoja.cell(row = 5, column = i+8)
+for i in range (3):
+    celda = hoja.cell(row = 5, column = i+7)
     celda.fill = relleno_verde__titulos
     celda.font = negritas
  
 #High Hours Value result
-celda = hoja['H6']
+celda = hoja['I6']
 celda.fill = relleno_verde
 celda.font = negritas
  
 #Low value result
-celda = hoja['I6']
+celda = hoja['G6']
 celda.fill = relleno_rojo
+celda.font = negritas
+
+#Total hrs result
+celda = hoja['H6']
+celda.fill = relleno_amarillo
 celda.font = negritas
  
  
@@ -641,7 +665,7 @@ for i in range (3):
     celda.font = negritas
  
 #High Productivity result
-celda = hoja['G10']
+celda = hoja['I10']
 celda.fill = relleno_verde
 celda.font = negritas
  
@@ -651,7 +675,7 @@ celda.fill = relleno_amarillo
 celda.font = negritas
  
 #Low Productivity result
-celda = hoja['I10']
+celda = hoja['G10']
 celda.fill = relleno_rojo
 celda.font = negritas
  
@@ -806,7 +830,7 @@ for columna in hoja.iter_cols(min_col=7, max_col=9):
                 longitud_maxima = longitud_celda
  
     # Establece el ancho de la columna para ajustarlo al contenido más largo
-    hoja.column_dimensions[columna_letra].width = longitud_maxima -2
+    hoja.column_dimensions[columna_letra].width = longitud_maxima -1
  
  
 workbook.save(ruta_completa)
